@@ -5,8 +5,22 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from .models import User
 from .serializers import UserSerializer
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class UserRegisterView(APIView):
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description="User's email"),
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description="User's username"),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description="User's password", format="password"),
+            },
+            required=['email', 'username', 'password']
+        ),
+        responses={201: "User registered successfully", 400: "Validation error"}
+    )
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
